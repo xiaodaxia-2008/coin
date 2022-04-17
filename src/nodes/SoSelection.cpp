@@ -878,7 +878,8 @@ SoSelection::handleEvent(SoHandleEventAction * action)
       if (selectionpath) {
         this->mouseDownPickPath = selectionpath;
         this->mouseDownPickPath->ref();
-        action->setHandled();
+        // comment so that we can still manipulating the camera when picking
+        // action->setHandled();
       }
     }
   }
