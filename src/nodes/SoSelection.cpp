@@ -897,7 +897,8 @@ SoSelection::handleEvent(SoHandleEventAction * action)
       }
     }
     else {
-      if (haltaction) action->setHandled();
+      // comment so that we can still manipulating the camera when picking
+      // if (haltaction) action->setHandled();
       
       if (!ignorepick) {
         if (selpath) selpath->ref();
