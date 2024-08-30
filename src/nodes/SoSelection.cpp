@@ -860,8 +860,13 @@ SoSelection::handleEvent(SoHandleEventAction * action)
 
   const SoEvent * event = action->getEvent();
 
+  static  SbTime time_down;
+  static SbTime time_up;
+
   SbBool haltaction = FALSE;
   if (SO_MOUSE_PRESS_EVENT(event, BUTTON1)) {
+    time_down = event->getTime();
+
     if (this->mouseDownPickPath) {
       this->mouseDownPickPath->unref();
       this->mouseDownPickPath = NULL;
@@ -884,28 +889,34 @@ SoSelection::handleEvent(SoHandleEventAction * action)
     }
   }
   else if (SO_MOUSE_RELEASE_EVENT(event, BUTTON1)) {
-    SbBool ignorepick = FALSE;
-    // call pick filter callback (called from getSelectionPath()) even
-    // if the event was handled by a child node.
-    SoPath * selpath = this->getSelectionPath(action, ignorepick, haltaction);
-    if (action->isHandled()) {
-      // if the event was handled by a child node we should not invoke
-      // the selection policy
-      if (selpath) {
-        selpath->ref();
-        selpath->unref();
+    time_up = event->getTime();
+
+    auto duration = time_up - time_down;
+    if (duration.getValue() <= 1.0) {
+
+      SbBool ignorepick = FALSE;
+      // call pick filter callback (called from getSelectionPath()) even
+      // if the event was handled by a child node.
+      SoPath * selpath = this->getSelectionPath(action, ignorepick, haltaction);
+      if (action->isHandled()) {
+        // if the event was handled by a child node we should not invoke
+        // the selection policy
+        if (selpath) {
+          selpath->ref();
+          selpath->unref();
+        }
       }
-    }
-    else {
-      // comment so that we can still manipulating the camera when picking
-      // if (haltaction) action->setHandled();
-      
-      if (!ignorepick) {
-        if (selpath) selpath->ref();
-        this->startCBList->invokeCallbacks(this);
-        this->invokeSelectionPolicy(selpath, event->wasShiftDown());
-        this->finishCBList->invokeCallbacks(this);
-        if (selpath) selpath->unref();
+      else {
+        // comment so that we can still manipulating the camera when picking
+        // if (haltaction) action->setHandled();
+        
+        if (!ignorepick) {
+          if (selpath) selpath->ref();
+          this->startCBList->invokeCallbacks(this);
+          this->invokeSelectionPolicy(selpath, event->wasShiftDown());
+          this->finishCBList->invokeCallbacks(this);
+          if (selpath) selpath->unref();
+        }
       }
     }
     if (this->mouseDownPickPath) {
