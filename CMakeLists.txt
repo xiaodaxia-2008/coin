@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 set(COIN_MAJOR_VERSION 4)
 set(COIN_MINOR_VERSION 0)
-set(COIN_MICRO_VERSION 2)
+set(COIN_MICRO_VERSION 3)
 set(COIN_BETA_VERSION)
 set(COIN_VERSION ${COIN_MAJOR_VERSION}.${COIN_MINOR_VERSION}.${COIN_MICRO_VERSION}${COIN_BETA_VERSION})
 
@@ -39,6 +39,12 @@ endif()
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(FATAL_ERROR "${CMAKE_PROJECT_NAME} requires an out of source build. Please create a separate build directory and run 'cmake <path_to_${CMAKE_PROJECT_NAME}> [options]' from there.")
 endif()
+
+# ############################################################################
+# Set minimum C++ standard needed to compile the Coin code
+# ############################################################################
+set( CMAKE_CXX_STANDARD 11 CACHE STRING "C++ standard used for the build" )
+message( STATUS "Setting C++ standard: '${CMAKE_CXX_STANDARD}', which is the minimum needed to compile Coin.")
 
 # ############################################################################
 # Include necessary submodules
